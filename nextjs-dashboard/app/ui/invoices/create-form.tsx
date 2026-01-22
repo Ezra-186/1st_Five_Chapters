@@ -1,22 +1,25 @@
 'use client';
 
-import { CustomerField } from '@/app/lib/definitions';
-import { createInvoice } from '@/app/lib/actions';
-import type { State } from '@/app/lib/actions';
-import Link from 'next/link';
 import { useActionState } from 'react';
+import Link from 'next/link';
 import {
   CheckIcon,
   ClockIcon,
   CurrencyDollarIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
+
+import type { CustomerField } from '@/app/lib/definitions';
+import { createInvoice, type State } from '@/app/lib/actions';
 import { Button } from '@/app/ui/button';
 
 const initialState: State = { message: null, errors: {} };
 
 export default function Form({ customers }: { customers: CustomerField[] }) {
-  const [state, formAction] = useActionState(createInvoice, initialState);
+  const [state, formAction, isPending] = useActionState(
+    createInvoice,
+    initialState,
+  );
 
   const customerErrorId = 'customer-error';
   const amountErrorId = 'amount-error';
@@ -24,22 +27,20 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
   const formMessageId = 'form-message';
 
   return (
-    <form action={formAction}>
+    <form action={formAction} aria-describedby={formMessageId}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/* Customer Name */}
+        {/* Customer */}
         <div className="mb-4">
           <label htmlFor="customer" className="mb-2 block text-sm font-medium">
             Choose customer
           </label>
-
           <div className="relative">
             <select
               id="customer"
               name="customerId"
-              className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+              className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2"
               defaultValue=""
               aria-describedby={customerErrorId}
-              aria-invalid={Boolean(state.errors?.customerId?.length)}
             >
               <option value="" disabled>
                 Select a customer
@@ -50,7 +51,6 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                 </option>
               ))}
             </select>
-
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
 
@@ -63,26 +63,22 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
           </div>
         </div>
 
-        {/* Invoice Amount */}
+        {/* Amount */}
         <div className="mb-4">
           <label htmlFor="amount" className="mb-2 block text-sm font-medium">
             Choose an amount
           </label>
-
           <div className="relative mt-2 rounded-md">
-            <div className="relative">
-              <input
-                id="amount"
-                name="amount"
-                type="number"
-                step="0.01"
-                placeholder="Enter USD amount"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-                aria-describedby={amountErrorId}
-                aria-invalid={Boolean(state.errors?.amount?.length)}
-              />
-              <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-            </div>
+            <input
+              id="amount"
+              name="amount"
+              type="number"
+              step="0.01"
+              placeholder="Enter USD amount"
+              className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2"
+              aria-describedby={amountErrorId}
+            />
+            <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
           </div>
 
           <div id={amountErrorId} aria-live="polite" aria-atomic="true">
@@ -94,7 +90,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
           </div>
         </div>
 
-        {/* Invoice Status */}
+        {/* Status */}
         <fieldset aria-describedby={statusErrorId}>
           <legend className="mb-2 block text-sm font-medium">
             Set the invoice status
@@ -109,7 +105,6 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                   type="radio"
                   value="pending"
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                  aria-invalid={Boolean(state.errors?.status?.length)}
                 />
                 <label
                   htmlFor="pending"
@@ -126,7 +121,6 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                   type="radio"
                   value="paid"
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                  aria-invalid={Boolean(state.errors?.status?.length)}
                 />
                 <label
                   htmlFor="paid"
@@ -161,7 +155,9 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
         >
           Cancel
         </Link>
-        <Button type="submit">Create Invoice</Button>
+        <Button type="submit" aria-disabled={isPending}>
+          {isPending ? 'Creating...' : 'Create Invoice'}
+        </Button>
       </div>
     </form>
   );

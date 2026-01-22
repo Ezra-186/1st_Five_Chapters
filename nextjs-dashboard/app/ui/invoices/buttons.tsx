@@ -1,5 +1,5 @@
-import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { deleteInvoice } from '@/app/lib/actions';
 
 export function CreateInvoice() {
@@ -24,7 +24,6 @@ export function UpdateInvoice({ id }: { id: string }) {
     </Link>
   );
 }
-
 
 export function DeleteInvoice({ id }: { id: string }) {
   return (

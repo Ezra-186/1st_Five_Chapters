@@ -5,7 +5,10 @@ import { authenticate } from '@/app/lib/actions';
 import { Button } from '@/app/ui/button';
 
 export default function LoginForm() {
-  const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
+  const [errorMessage, formAction, isPending] = useActionState(
+    authenticate,
+    undefined,
+  );
 
   return (
     <form action={formAction} className="space-y-3">
@@ -14,7 +17,10 @@ export default function LoginForm() {
 
         <div className="w-full">
           <div>
-            <label className="mb-2 mt-5 block text-xs font-medium text-gray-900" htmlFor="email">
+            <label
+              className="mb-2 mt-5 block text-xs font-medium text-gray-900"
+              htmlFor="email"
+            >
               Email
             </label>
             <input
@@ -23,12 +29,14 @@ export default function LoginForm() {
               type="email"
               name="email"
               placeholder="Enter your email address"
-              required
             />
           </div>
 
           <div className="mt-4">
-            <label className="mb-2 block text-xs font-medium text-gray-900" htmlFor="password">
+            <label
+              className="mb-2 block text-xs font-medium text-gray-900"
+              htmlFor="password"
+            >
               Password
             </label>
             <input
@@ -37,8 +45,6 @@ export default function LoginForm() {
               type="password"
               name="password"
               placeholder="Enter password"
-              required
-              minLength={6}
             />
           </div>
         </div>
