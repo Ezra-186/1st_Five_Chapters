@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt';
-import postgres from 'postgres';
+import postgres, { Sql } from 'postgres';
 import { invoices, customers, revenue, users } from '../lib/placeholder-data';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-async function seedUsers(db: any) {
+async function seedUsers(db: Sql) {
   await db`
     CREATE TABLE IF NOT EXISTS users (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -26,7 +26,7 @@ async function seedUsers(db: any) {
   );
 }
 
-async function seedCustomers(db: any) {
+async function seedCustomers(db: Sql) {
   await db`
     CREATE TABLE IF NOT EXISTS customers (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -45,7 +45,7 @@ async function seedCustomers(db: any) {
   );
 }
 
-async function seedInvoices(db: any) {
+async function seedInvoices(db: Sql) {
   await db`
     CREATE TABLE IF NOT EXISTS invoices (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -64,7 +64,7 @@ async function seedInvoices(db: any) {
   );
 }
 
-async function seedRevenue(db: any) {
+async function seedRevenue(db: Sql) {
   await db`
     CREATE TABLE IF NOT EXISTS revenue (
       month VARCHAR(4) NOT NULL UNIQUE,

@@ -34,7 +34,7 @@ export default async function Page(props: {
       </Suspense>
 
       <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={totalPages} />
+        <Pagination totalPages={totalPages} currentPage={currentPage} />
       </div>
     </main>
   );

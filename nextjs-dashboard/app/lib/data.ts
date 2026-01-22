@@ -143,6 +143,13 @@ export async function fetchInvoicesPages(query: string) {
 }
 
 export async function fetchInvoiceById(id: string) {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if (!uuidRegex.test(id)) {
+    return null;
+  }
+
   try {
     const data = await sql<InvoiceForm[]>`
       SELECT
@@ -154,14 +161,22 @@ export async function fetchInvoiceById(id: string) {
       WHERE invoices.id = ${id};
     `;
 
+    if (data.length === 0) {
+      return null;
+    }
+
     const invoice = data.map((invoice) => ({
       ...invoice,
-      // Convert amount from cents to dollars
       amount: invoice.amount / 100,
     }));
 
     return invoice[0];
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as { code?: string };
+    if (err?.code === '22P02') {
+      return null;
+    }
+
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoice.');
   }
@@ -170,16 +185,13 @@ export async function fetchInvoiceById(id: string) {
 export async function fetchCustomers() {
   try {
     const customers = await sql<CustomerField[]>`
-      SELECT
-        id,
-        name
+      SELECT id, name
       FROM customers
       ORDER BY name ASC
     `;
-
     return customers;
-  } catch (err) {
-    console.error('Database Error:', err);
+  } catch (error) {
+    console.error('Database Error:', error);
     throw new Error('Failed to fetch all customers.');
   }
 }
@@ -216,3 +228,4 @@ export async function fetchFilteredCustomers(query: string) {
     throw new Error('Failed to fetch customer table.');
   }
 }
+
