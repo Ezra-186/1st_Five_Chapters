@@ -11,18 +11,18 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 const InvoiceSchema = z.object({
   id: z.string(),
-  customerId: z.string({ invalid_type_error: 'Please select a customer.' }),
-  amount: z.coerce
-    .number()
-    .gt(0, { message: 'Please enter an amount greater than 0.' }),
+  customerId: z.string({
+    invalid_type_error: 'Please select a customer.',
+  }),
+  amount: z.coerce.number().gt(0, {
+    message: 'Please enter an amount greater than 0.',
+  }),
   status: z.enum(['pending', 'paid'], {
     invalid_type_error: 'Please select an invoice status.',
   }),
-  date: z.string(),
 });
 
-const CreateInvoiceSchema = InvoiceSchema.omit({ id: true, date: true });
-const UpdateInvoiceSchema = InvoiceSchema.omit({ date: true });
+const CreateInvoiceSchema = InvoiceSchema.omit({ id: true });
 
 export type State = {
   errors?: {
@@ -34,10 +34,7 @@ export type State = {
   message?: string | null;
 };
 
-export async function createInvoice(
-  prevState: State,
-  formData: FormData,
-): Promise<State> {
+export async function createInvoice(prevState: State, formData: FormData): Promise<State> {
   const validatedFields = CreateInvoiceSchema.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
@@ -68,11 +65,8 @@ export async function createInvoice(
   redirect('/dashboard/invoices');
 }
 
-export async function updateInvoice(
-  prevState: State,
-  formData: FormData,
-): Promise<State> {
-  const validatedFields = UpdateInvoiceSchema.safeParse({
+export async function updateInvoice(prevState: State, formData: FormData): Promise<State> {
+  const validatedFields = InvoiceSchema.safeParse({
     id: formData.get('id'),
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
@@ -108,17 +102,12 @@ export async function deleteInvoice(formData: FormData): Promise<void> {
 
   if (typeof id !== 'string' || !id) return;
 
-  try {
-    await sql`DELETE FROM invoices WHERE id = ${id}`;
-  } catch {
-    return;
-  }
-
+  await sql`DELETE FROM invoices WHERE id = ${id}`;
   revalidatePath('/dashboard/invoices');
 }
 
 export async function authenticate(
-  _prevState: string | undefined,
+  prevState: string | undefined,
   formData: FormData,
 ): Promise<string | undefined> {
   try {
@@ -126,10 +115,12 @@ export async function authenticate(
     return undefined;
   } catch (error) {
     if (error instanceof AuthError) {
-      if (error.type === 'CredentialsSignin') {
-        return 'Invalid credentials.';
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
       }
-      return 'Something went wrong.';
     }
     throw error;
   }
