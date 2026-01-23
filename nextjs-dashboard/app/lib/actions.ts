@@ -106,12 +106,37 @@ export async function deleteInvoice(formData: FormData): Promise<void> {
   revalidatePath('/dashboard/invoices');
 }
 
+// export async function authenticate(
+//   _prevState: string | undefined,
+//   formData: FormData,
+// ): Promise<string | undefined> {
+//   try {
+//     await signIn('credentials', formData);
+//   } catch (error) {
+//     if (error instanceof AuthError) {
+//       switch (error.type) {
+//         case 'CredentialsSignin':
+//           return 'Invalid credentials.';
+//         default:
+//           return 'Something went wrong.';
+//       }
+//     }
+//     throw error;
+//   }
+// }
+
 export async function authenticate(
-  _prevState: string | undefined,
+  prevState: string | undefined,
   formData: FormData,
-): Promise<string | undefined> {
+) {
   try {
-    await signIn('credentials', formData);
+    await signIn('credentials', {
+      email: formData.get('email'),
+      password: formData.get('password'),
+      redirect: false,
+    });
+
+    redirect('/dashboard');
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
