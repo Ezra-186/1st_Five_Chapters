@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 import { updateInvoice, type State } from '@/app/lib/actions';
-import { CustomerField, InvoiceForm } from '@/app/lib/definitions';
+import type { CustomerField, InvoiceForm } from '@/app/lib/definitions';
 import { Button } from '@/app/ui/button';
 import {
   CheckIcon,
@@ -33,7 +33,6 @@ export default function EditInvoiceForm({
       <input type="hidden" name="id" value={invoice.id} />
 
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/* Customer Name */}
         <div className="mb-4">
           <label htmlFor="customer" className="mb-2 block text-sm font-medium">
             Choose customer
@@ -42,7 +41,7 @@ export default function EditInvoiceForm({
             <select
               id="customer"
               name="customerId"
-              className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2"
+              className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               defaultValue={invoice.customer_id}
               aria-describedby={customerErrorId}
             >
@@ -57,6 +56,7 @@ export default function EditInvoiceForm({
             </select>
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
+
           <div id={customerErrorId} aria-live="polite" aria-atomic="true">
             {state.errors?.customerId?.map((error) => (
               <p className="mt-2 text-sm text-red-500" key={error}>
@@ -66,7 +66,6 @@ export default function EditInvoiceForm({
           </div>
         </div>
 
-        {/* Invoice Amount */}
         <div className="mb-4">
           <label htmlFor="amount" className="mb-2 block text-sm font-medium">
             Choose an amount
@@ -80,22 +79,22 @@ export default function EditInvoiceForm({
                 step="0.01"
                 defaultValue={invoice.amount}
                 placeholder="Enter USD amount"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2"
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                 aria-describedby={amountErrorId}
               />
               <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
-          </div>
-          <div id={amountErrorId} aria-live="polite" aria-atomic="true">
-            {state.errors?.amount?.map((error) => (
-              <p className="mt-2 text-sm text-red-500" key={error}>
-                {error}
-              </p>
-            ))}
+
+            <div id={amountErrorId} aria-live="polite" aria-atomic="true">
+              {state.errors?.amount?.map((error) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Invoice Status */}
         <fieldset>
           <legend className="mb-2 block text-sm font-medium">
             Set the invoice status
@@ -138,20 +137,22 @@ export default function EditInvoiceForm({
                 </label>
               </div>
             </div>
-          </div>
 
-          <div id={statusErrorId} aria-live="polite" aria-atomic="true">
-            {state.errors?.status?.map((error) => (
-              <p className="mt-2 text-sm text-red-500" key={error}>
-                {error}
-              </p>
-            ))}
+            <div id={statusErrorId} aria-live="polite" aria-atomic="true">
+              {state.errors?.status?.map((error) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+            </div>
           </div>
         </fieldset>
 
         <div id={formMessageId} aria-live="polite" aria-atomic="true">
           {state.message ? (
-            <p className="mt-4 text-sm text-red-500">{state.message}</p>
+            <p className="mt-4 text-sm text-red-500">
+              {state.message}
+            </p>
           ) : null}
         </div>
       </div>
@@ -159,7 +160,7 @@ export default function EditInvoiceForm({
       <div className="mt-6 flex justify-end gap-4">
         <Link
           href="/dashboard/invoices"
-          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 hover:bg-gray-200"
+          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           Cancel
         </Link>
